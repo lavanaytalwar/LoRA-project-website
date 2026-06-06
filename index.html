@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LoRA on Tiny BERT | Project Case Study</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="LoRA project home">
+        <span class="brand-mark">L</span>
+        <span>LoRA Project</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html" aria-current="page">Overview</a>
+        <a href="workflow.html">Workflow</a>
+        <a href="results.html">Results</a>
+        <a href="applications.html">Applications</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <p class="eyebrow">Lightweight LoRA reproduction</p>
+          <h1>Fine-tuning fewer parameters without giving up accuracy.</h1>
+          <p class="lead">
+            This project reproduces the core mechanics of Low-Rank Adaptation on
+            SST-2 sentiment classification using a CPU-friendly BERT-tiny setup.
+            It compares full fine-tuning, a custom LoRA implementation, and
+            Hugging Face PEFT.
+          </p>
+          <div class="actions">
+            <a class="button primary" href="results.html">View Results</a>
+            <a class="button" href="workflow.html">See Workflow</a>
+          </div>
+          <div class="tag-row" aria-label="Project context">
+            <span class="tag">Model: prajjwal1/bert-tiny</span>
+            <span class="tag">Dataset: SST-2 subset</span>
+            <span class="tag">Hardware: CPU only</span>
+            <span class="tag">Epochs: 3</span>
+          </div>
+        </div>
+
+        <aside class="diagram" aria-label="Project summary diagram">
+          <div class="flow">
+            <div class="flow-step">
+              <span class="step-kicker">Input</span>
+              <strong>SST-2 reviews</strong>
+              <p>Small sentiment dataset slice for quick CPU experiments.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">Model</span>
+              <strong>BERT-tiny</strong>
+              <p>A compact encoder model suitable for local reproduction.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">Methods</span>
+              <strong>Full FT + LoRA</strong>
+              <p>Train all weights or only low-rank adapter updates.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">Output</span>
+              <strong>Metrics + plots</strong>
+              <p>Accuracy, F1, trainable parameters, time, and checkpoints.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Headline findings</p>
+            <h2>Small adapters performed competitively.</h2>
+          </div>
+          <p>
+            The best custom LoRA run used rank 4 and trained less than half a
+            percent of the full model parameters while beating the full
+            fine-tune accuracy in this lightweight setup.
+          </p>
+        </div>
+
+        <div class="grid four">
+          <article class="metric">
+            <p class="label">Full fine-tune accuracy</p>
+            <p class="value">0.696</p>
+            <p class="note">All 4,386,178 parameters trainable.</p>
+          </article>
+          <article class="metric">
+            <p class="label">Best custom LoRA</p>
+            <p class="value">0.706</p>
+            <p class="note">Rank 4 achieved the best accuracy.</p>
+          </article>
+          <article class="metric">
+            <p class="label">Rank 4 trainable params</p>
+            <p class="value">19,714</p>
+            <p class="note">About 0.45% of the full model parameters.</p>
+          </article>
+          <article class="metric">
+            <p class="label">PEFT adapter checkpoint</p>
+            <p class="value">1.06 MB</p>
+            <p class="note">Adapter-only storage in the PEFT run.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">What was built</p>
+            <h2>A compact reproduction of LoRA mechanics.</h2>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <article class="card">
+            <h3>Custom LoRA implementation</h3>
+            <p>
+              The repo adds LoRA wrappers around selected linear layers, freezes
+              the base weights, trains low-rank matrices A and B, and supports
+              merge and unmerge behavior for adapted weights.
+            </p>
+            <ul class="list-clean">
+              <li>Target modules include query, key, value, and dense layers.</li>
+              <li>Rank sweep covers r=2, r=4, r=8, and r=16.</li>
+              <li>Metrics track accuracy, F1, trainable parameters, time, and checkpoint size.</li>
+            </ul>
+          </article>
+          <article class="card">
+            <h3>Why LoRA matters</h3>
+            <p>
+              Instead of rewriting every model weight, LoRA learns a compact
+              task-specific update. The base model stays fixed, and small
+              adapters can be trained, stored, swapped, or served independently.
+            </p>
+            <ul class="list-clean">
+              <li>Cheaper customization for domain-specific tasks.</li>
+              <li>Faster experimentation than full fine-tuning.</li>
+              <li>Practical deployment pattern for many users or customers.</li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Explore the case study</p>
+            <h2>Four pages, one story.</h2>
+          </div>
+        </div>
+
+        <div class="grid three">
+          <a class="card" href="workflow.html">
+            <h3>Workflow</h3>
+            <p>Trace the pipeline from dataset preparation through model training and report generation.</p>
+          </a>
+          <a class="card" href="results.html">
+            <h3>Results</h3>
+            <p>Review the metrics table, generated plots, and interpretation of the rank sweep.</p>
+          </a>
+          <a class="card" href="applications.html">
+            <h3>Applications</h3>
+            <p>Connect the experiment to startup, SaaS, domain adaptation, and edge deployment use cases.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Static project website for the LoRA mechanics on BERT-tiny SST-2 reproduction.
+      Developer: Lavanay Talwar.
+    </div>
+  </footer>
+</body>
+</html>

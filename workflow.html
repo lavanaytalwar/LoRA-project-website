@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workflow | LoRA Project</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="LoRA project home">
+        <span class="brand-mark">L</span>
+        <span>LoRA Project</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Overview</a>
+        <a href="workflow.html" aria-current="page">Workflow</a>
+        <a href="results.html">Results</a>
+        <a href="applications.html">Applications</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">Workflow</p>
+        <h1>From sentiment data to LoRA experiment report.</h1>
+        <p class="lead">
+          The project keeps the experiment intentionally small: SST-2 sentiment
+          classification, a tiny BERT model, CPU training, and a repeatable
+          pipeline for comparing full fine-tuning against LoRA adapters.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Pipeline</p>
+            <h2>End-to-end experiment flow.</h2>
+          </div>
+          <p>
+            Each step maps to the repo artifacts: configuration, dataset loading,
+            LoRA injection, training, evaluation, and report generation.
+          </p>
+        </div>
+
+        <div class="diagram" aria-label="LoRA experiment pipeline">
+          <div class="flow long">
+            <div class="flow-step">
+              <span class="step-kicker">1. Config</span>
+              <strong>Experiment settings</strong>
+              <p><code>configs/sst2_bert_tiny.yaml</code> defines model, data, LoRA, and training options.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">2. Data</span>
+              <strong>SST-2 subset</strong>
+              <p>2,000 train examples and 500 eval examples keep runs CPU-friendly.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">3. Base</span>
+              <strong>BERT-tiny</strong>
+              <p><code>prajjwal1/bert-tiny</code> provides a small encoder backbone.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">4. Full FT</span>
+              <strong>Train all weights</strong>
+              <p>Baseline updates all 4,386,178 parameters.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">5. Custom LoRA</span>
+              <strong>Rank sweep</strong>
+              <p>Runs r=2, r=4, r=8, and r=16 with frozen base weights.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">6. PEFT</span>
+              <strong>Library check</strong>
+              <p>PEFT LoRA validates the adapter behavior and checkpoint size.</p>
+            </div>
+            <div class="flow-step">
+              <span class="step-kicker">7. Report</span>
+              <strong>Metrics and plots</strong>
+              <p>Evaluation writes CSV metrics, plots, and a Markdown report.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">LoRA mechanism</p>
+            <h2>The adapter path is small by design.</h2>
+          </div>
+        </div>
+
+        <div class="comparison">
+          <article class="card">
+            <h3>Full fine-tuning path</h3>
+            <p>
+              The baseline lets every parameter receive gradient updates. This is
+              simple and strong, but it creates one full model checkpoint per task
+              and scales poorly when many specialized variants are needed.
+            </p>
+            <div class="diagram" aria-label="Full fine-tuning diagram">
+              <div class="flow">
+                <div class="flow-step">
+                  <span class="step-kicker">Input</span>
+                  <strong>Review text</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Model</span>
+                  <strong>All weights train</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Task</span>
+                  <strong>Sentiment head</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Save</span>
+                  <strong>Full checkpoint</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="card">
+            <h3>LoRA adapter path</h3>
+            <p>
+              LoRA freezes the original weight matrix and trains a low-rank
+              update. In this repo, selected linear layers receive trainable
+              matrices A and B with scaling alpha divided by rank.
+            </p>
+            <div class="diagram" aria-label="LoRA adapter diagram">
+              <div class="flow">
+                <div class="flow-step">
+                  <span class="step-kicker">Frozen</span>
+                  <strong>Base W</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Train</span>
+                  <strong>Matrix A</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Train</span>
+                  <strong>Matrix B</strong>
+                </div>
+                <div class="flow-step">
+                  <span class="step-kicker">Adapt</span>
+                  <strong>W + BA</strong>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Implementation map</p>
+            <h2>What the repo actually does.</h2>
+          </div>
+        </div>
+
+        <div class="grid three">
+          <article class="card">
+            <h3>LoRA injection</h3>
+            <p>
+              <code>src/lora.py</code> wraps selected <code>nn.Linear</code>
+              modules, freezes base weights, and exposes trainable adapter
+              parameters.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Training modes</h3>
+            <p>
+              <code>src/train.py</code> runs either full fine-tuning or LoRA
+              fine-tuning using the same data and evaluation settings.
+            </p>
+          </article>
+          <article class="card">
+            <h3>Evaluation output</h3>
+            <p>
+              <code>src/evaluate.py</code> and <code>scripts/make_report.py</code>
+              produce <code>outputs/metrics.csv</code>, plots, and
+              <code>results.md</code>.
+            </p>
+          </article>
+        </div>
+
+        <div class="callout warning" style="margin-top: 1rem;">
+          <strong>Scaled-down context:</strong> This is a mechanics-focused
+          reproduction on BERT-tiny and a small SST-2 subset, not a full
+          large-language-model reproduction of the original LoRA paper.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Next: review the metrics and plots on <a href="results.html">Results</a>.
+      Developer: Lavanay Talwar.
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Results | LoRA Project</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Main navigation">
+      <a class="brand" href="index.html" aria-label="LoRA project home">
+        <span class="brand-mark">L</span>
+        <span>LoRA Project</span>
+      </a>
+      <div class="nav-links">
+        <a href="index.html">Overview</a>
+        <a href="workflow.html">Workflow</a>
+        <a href="results.html" aria-current="page">Results</a>
+        <a href="applications.html">Applications</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container">
+        <p class="eyebrow">Results</p>
+        <h1>Rank 4 LoRA was the strongest custom run.</h1>
+        <p class="lead">
+          The experiment compares full fine-tuning, four custom LoRA ranks, and
+          one PEFT LoRA run. The best custom adapter reached 0.706 accuracy while
+          training 19,714 parameters.
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid four">
+          <article class="metric">
+            <p class="label">Best accuracy</p>
+            <p class="value">0.706</p>
+            <p class="note">Custom LoRA rank 4.</p>
+          </article>
+          <article class="metric">
+            <p class="label">Full accuracy</p>
+            <p class="value">0.696</p>
+            <p class="note">Full fine-tuning baseline.</p>
+          </article>
+          <article class="metric">
+            <p class="label">LoRA r4 params</p>
+            <p class="value">19,714</p>
+            <p class="note">Trainable adapter plus classifier params.</p>
+          </article>
+          <article class="metric">
+            <p class="label">PEFT checkpoint</p>
+            <p class="value">1.06 MB</p>
+            <p class="note">Adapter-only checkpoint size.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Rank sweep</p>
+            <h2>Accuracy changed only slightly across ranks.</h2>
+          </div>
+          <p>
+            The custom LoRA sweep shows the useful tradeoff: small ranks trained
+            very few parameters, and rank 4 produced the best validation result
+            in this run.
+          </p>
+        </div>
+
+        <div class="card">
+          <h3>Validation accuracy by method</h3>
+          <div class="mini-chart" aria-label="Bar chart of validation accuracy by method">
+            <div>
+              <div class="bar" style="height: 69.6%;">0.696</div>
+              <p class="caption">Full</p>
+            </div>
+            <div>
+              <div class="bar" style="height: 68.2%;">0.682</div>
+              <p class="caption">r=2</p>
+            </div>
+            <div>
+              <div class="bar" style="height: 70.6%;">0.706</div>
+              <p class="caption">r=4</p>
+            </div>
+            <div>
+              <div class="bar" style="height: 70%;">0.700</div>
+              <p class="caption">r=8</p>
+            </div>
+            <div>
+              <div class="bar" style="height: 69.2%;">0.692</div>
+              <p class="caption">r=16</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Source metrics</p>
+            <h2>All runs from <code>outputs/metrics.csv</code>.</h2>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Mode</th>
+                <th>Rank</th>
+                <th>Accuracy</th>
+                <th>F1</th>
+                <th>Trainable Params</th>
+                <th>Total Params</th>
+                <th>Train Time</th>
+                <th>Checkpoint</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Full</td>
+                <td>-</td>
+                <td>0.696</td>
+                <td>0.7216</td>
+                <td>4,386,178</td>
+                <td>4,386,178</td>
+                <td>6.33s</td>
+                <td>17.64 MB</td>
+              </tr>
+              <tr>
+                <td>Custom LoRA</td>
+                <td>2</td>
+                <td>0.682</td>
+                <td>0.7028</td>
+                <td>9,986</td>
+                <td>4,395,906</td>
+                <td>3.88s</td>
+                <td>17.68 MB</td>
+              </tr>
+              <tr class="highlight">
+                <td>Custom LoRA</td>
+                <td>4</td>
+                <td>0.706</td>
+                <td>0.7351</td>
+                <td>19,714</td>
+                <td>4,405,634</td>
+                <td>3.84s</td>
+                <td>17.71 MB</td>
+              </tr>
+              <tr>
+                <td>Custom LoRA</td>
+                <td>8</td>
+                <td>0.700</td>
+                <td>0.7024</td>
+                <td>39,170</td>
+                <td>4,425,090</td>
+                <td>3.89s</td>
+                <td>17.79 MB</td>
+              </tr>
+              <tr>
+                <td>Custom LoRA</td>
+                <td>16</td>
+                <td>0.692</td>
+                <td>0.7061</td>
+                <td>78,082</td>
+                <td>4,464,002</td>
+                <td>3.91s</td>
+                <td>17.94 MB</td>
+              </tr>
+              <tr>
+                <td>PEFT LoRA</td>
+                <td>8</td>
+                <td>0.698</td>
+                <td>0.7010</td>
+                <td>39,170</td>
+                <td>4,425,348</td>
+                <td>5.40s</td>
+                <td>1.06 MB</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <p class="eyebrow">Generated plots</p>
+            <h2>Visual artifacts from the report script.</h2>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <figure class="figure">
+            <img src="assets/acc_vs_rank.png" alt="Line plot showing accuracy versus LoRA rank">
+            <figcaption>Accuracy versus LoRA rank for custom LoRA and PEFT LoRA runs.</figcaption>
+          </figure>
+          <figure class="figure">
+            <img src="assets/acc_vs_trainable_params.png" alt="Scatter plot showing accuracy versus trainable parameters">
+            <figcaption>Accuracy versus trainable parameter count across training modes.</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="grid two">
+          <article class="callout success">
+            <h3>Interpretation</h3>
+            <p>
+              The run supports the practical LoRA intuition: for a narrow task,
+              a low-rank update can be enough to move model behavior. Rank 4 was
+              the sweet spot here, while larger ranks did not produce better
+              accuracy in this short CPU experiment.
+            </p>
+          </article>
+          <article class="callout warning">
+            <h3>Limitation</h3>
+            <p>
+              Custom LoRA checkpoints are large because this repo saves full
+              Hugging Face checkpoints for simplicity. The PEFT run demonstrates
+              the real adapter-only storage advantage with a 1.06 MB checkpoint.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      Source artifacts: <code>outputs/metrics.csv</code>, <code>outputs/plots</code>, and <code>results.md</code>.
+      Developer: Lavanay Talwar.
+    </div>
+  </footer>
+</body>
+</html>
